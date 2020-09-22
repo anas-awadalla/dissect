@@ -108,12 +108,12 @@ class ImageVisualizer:
         Visualizes the given activations, thresholded at a specified level,
         overlaid on the given image, as a PIL image.
         '''
-        result_image = self.pytorch_masked_image(imagedata,
+        result_image, mask = self.pytorch_masked_image(imagedata,
                                                  activations=activations,
                                                  unit=unit, level=level, percent_level=percent_level,
                                                  **kwargs)
         return PIL.Image.fromarray(
-            result_image.permute(1, 2, 0).cpu().numpy())
+            result_image.permute(1, 2, 0).cpu().numpy()), mask
 
     def pytorch_masked_image(self, imagedata, activations=None, unit=None,
                              level=None, percent_level=None, thickness=1, mask=None,
@@ -142,7 +142,7 @@ class ImageVisualizer:
              else inside_color) * inside +
             border_color * border +
             outside_bright * scaled_image * outside).clamp(0, 255).byte()
-        return result_image
+        return result_image, mask
 
     def masked_delta(self, imagedata, activations, unit=None,
                      above=None, below=None):
